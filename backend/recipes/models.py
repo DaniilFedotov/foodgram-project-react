@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class Tag(models.Model):
@@ -20,19 +23,20 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
-    tags = models.ForeignKey(
+    tags = models.ManyToManyField(
         Tag,
-        null=True, # Временно. Не может быть нулевым.
-        on_delete=models.SET_NULL,
-        related_name='recipes')
-    """
+        related_name='recipes',
+        verbose_name='Теги',
+        through='RecipeTag')
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='recipes')
-    """
+        related_name='recipes',
+        verbose_name='Автор рецепта')
     ingredients = models.ManyToManyField(
         'Ingredient',
+        related_name='recipes',
+        verbose_name='Ингредиенты',
         through='RecipeIngredient')
     is_favorited = models.BooleanField(
         verbose_name='Находится ли в избранном')
@@ -41,7 +45,7 @@ class Recipe(models.Model):
     name = models.CharField(
         max_length=200,
         verbose_name='Название рецепта')
-    image = models.BinaryField()  #
+    #image = models.ImageField()
     text = models.TextField(
         verbose_name='Описание рецепта')
     cooking_time = models.PositiveIntegerField(
@@ -62,6 +66,15 @@ class Ingredient(models.Model):
         return self.name
 
 
+class RecipeTag(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE)
+    tag = models.ForeignKey(
+        Tag,
+        on_delete=models.CASCADE)
+
+
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
@@ -69,3 +82,5 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE)
+    amount = models.PositiveIntegerField(
+        verbose_name='Количество')
