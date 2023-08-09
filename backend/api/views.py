@@ -5,16 +5,13 @@ from .serializers import TagSerializer, RecipeSerializer, IngredientSerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):
-    queryset =  Tag.objects.all()
+    queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
 
 
 class IngredientViewSet(viewsets.ModelViewSet):

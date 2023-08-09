@@ -22,6 +22,7 @@ class Tag(models.Model):
 class Recipe(models.Model):
     tags = models.ForeignKey(
         Tag,
+        null=True, # Временно. Не может быть нулевым.
         on_delete=models.SET_NULL,
         related_name='recipes')
     """
