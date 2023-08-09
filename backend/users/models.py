@@ -1,3 +1,4 @@
+"""
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -6,28 +7,22 @@ from .user_roles import UserRoles
 
 class User(AbstractUser):
     email = models.EmailField(
-        max_length=254,
+        max_length=256,
         unique=True,)
     username = models.CharField(
         max_length=150,
-        unique=True,
-        blank=False,
-        null=False,)
+        unique=True)
     first_name = models.CharField(
         max_length=150,
-        unique=True,
-        blank=False,
-        null=False,)
+        unique=True)
     last_name = models.CharField(
         max_length=150,
-        unique=True,
-        blank=False,
-        null=False,)
-    role = models.CharField(  # Нужно ли?
-        max_length=150,
-        verbose_name='Роль',
-        choices=UserRoles.choices,
-        default=UserRoles.NOT_AUTH_USER,)
+        unique=True)
+    role = models.CharField(
+    max_length=150,
+    verbose_name='Роль',
+    choices=UserRoles.choices,
+    default=UserRoles.NOT_AUTH_USER,)
 
     def __str__(self):
         return f'{self.username}'
@@ -43,3 +38,4 @@ class User(AbstractUser):
     @property
     def is_not_auth_user(self):
         return self.role == UserRoles.NOT_AUTH_USER
+"""

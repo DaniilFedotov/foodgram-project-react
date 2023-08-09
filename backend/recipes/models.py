@@ -1,14 +1,38 @@
 from django.db import models
-from ..users.models import User
+from django.contrib.auth.models import AbstractUser
+
+#from users.models import User
+
+
+class User(AbstractUser):
+    email = models.EmailField(
+        max_length=256,
+        unique=True,)
+    username = models.CharField(
+        max_length=150,
+        unique=True)
+    first_name = models.CharField(
+        max_length=150,
+        unique=True)
+    last_name = models.CharField(
+        max_length=150,
+        unique=True)
+
+    def __str__(self):
+        return f'{self.username}'
 
 
 class Tag(models.Model):
     name = models.CharField(
-        max_length=256,  # ?
+        max_length=200,
+        null=True,
         verbose_name='Название тега')
-    color = models.CharField()  # Точно?
+    color = models.CharField(
+        max_length=7,
+        null=True,
+        verbose_name='Цвет тега')
     slug = models.SlugField(
-        max_length=50,  # ?
+        max_length=200,
         unique=True,
         verbose_name='Раздел тега')
 
@@ -19,38 +43,41 @@ class Tag(models.Model):
 class Recipe(models.Model):
     tags = models.ForeignKey(
         Tag,
-        related_name='recipes',)
+        on_delete=models.SET_NULL,
+        related_name='recipes',
+        verbose_name='Теги рецепта')
     author = models.ForeignKey(
         User,
-        related_name='recipes',)
+        on_delete=models.CASCADE,
+        related_name='recipes',
+        verbose_name='Автор рецепта')
     ingredients = models.ManyToManyField(
         'Ingredient',
-        through='RecipeIngredient',)
+        through='RecipeIngredient')
+    is_favorited = models.BooleanField(
+        verbose_name='Находится ли в избранном')
+    is_in_shopping_cart = models.BooleanField(
+        verbose_name='Находится ли в корзине')
     name = models.CharField(
-        max_length=200,  # Задано явно
-        verbose_name='Название рецепта',)
-    image = models.ImageField()
+        max_length=200,
+        verbose_name='Название рецепта')
+    image = models.BinaryField()  #
     text = models.TextField(
-        max_length=1500,
-        verbose_name='Описание рецепта',)
+        verbose_name='Описание рецепта')
     cooking_time = models.PositiveIntegerField(
-        verbose_name='Время приготовления (в минутах)')  # ДБ больше 1
+        verbose_name='Время приготовления (в минутах)')
 
 
     def __str__(self):
         return f'{self.name}'
 
 
-class ShoppingCart(models.Model):
-    content = models.ForeignKey(
-        Recipe,
-        many=True,
-        verbose_name='Список покупок'
-    )
-
-
 class Ingredient(models.Model):
-    name = 'jh,j'
+    name = models.CharField(
+        max_length=200,
+        unique=True)
+    measurement_unit = models.CharField(
+        max_length=200)
 
     def __str__(self):
         return f'{self.name}'
@@ -58,8 +85,8 @@ class Ingredient(models.Model):
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
-        Recipe,  # on_delete
-    )
+        Recipe,
+        on_delete=models.CASCADE)
     ingredient = models.ForeignKey(
-        Ingredient,  # on_delete
-    )
+        Ingredient,
+        on_delete=models.CASCADE)
