@@ -1,9 +1,9 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+#from django.contrib.auth.models import AbstractUser
 
-#from users.models import User
+from users.models import User
 
-
+"""
 class User(AbstractUser):
     email = models.EmailField(
         max_length=256,
@@ -20,7 +20,7 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.username}'
-
+"""
 
 class Tag(models.Model):
     name = models.CharField(
@@ -43,14 +43,13 @@ class Tag(models.Model):
 class Recipe(models.Model):
     tags = models.ForeignKey(
         Tag,
+        null=True,
         on_delete=models.SET_NULL,
-        related_name='recipes',
-        verbose_name='Теги рецепта')
+        related_name='recipes')
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='recipes',
-        verbose_name='Автор рецепта')
+        related_name='recipes')
     ingredients = models.ManyToManyField(
         'Ingredient',
         through='RecipeIngredient')
