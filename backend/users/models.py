@@ -46,3 +46,6 @@ class Follow(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'following'], name='follow_unique')]
+
+    def __str__(self):
+        return f'Подписка {self.user} на {self.following}'
