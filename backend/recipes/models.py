@@ -83,6 +83,14 @@ class RecipeTag(models.Model):
         Tag,
         on_delete=models.CASCADE)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'tag'], name='recipetag_unique')]
+
+    def __str__(self):
+        return f'Рецепт {self.recipe} имеет тег {self.tag}'
+
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
@@ -95,3 +103,30 @@ class RecipeIngredient(models.Model):
         verbose_name='Ингредиент')
     amount = models.PositiveIntegerField(
         verbose_name='Количество')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'], name='recipeingredient_unique')]
+
+    def __str__(self):
+        return f'Рецепт {self.recipe} содержит {self.ingredient}'
+
+
+class RecipeUser(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт')
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'user'], name='recipeuser_unique')]
+
+    def __str__(self):
+        return f'Рецепт {self.recipe} в избранном {self.user}'
