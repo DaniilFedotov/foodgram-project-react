@@ -51,6 +51,12 @@ class Recipe(models.Model):
         verbose_name='Описание рецепта')
     cooking_time = models.PositiveIntegerField(
         verbose_name='Время приготовления (в минутах)')
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата публикации')
+
+    class Meta:
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.name
@@ -59,9 +65,11 @@ class Recipe(models.Model):
 class Ingredient(models.Model):
     name = models.CharField(
         max_length=200,
-        unique=True)
+        unique=True,
+        verbose_name='Название ингредиента')
     measurement_unit = models.CharField(
-        max_length=200)
+        max_length=200,
+        verbose_name='Единица измерения ингредиента')
 
     def __str__(self):
         return self.name
@@ -79,9 +87,11 @@ class RecipeTag(models.Model):
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт')
     ingredient = models.ForeignKey(
         Ingredient,
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+        verbose_name='Ингредиент')
     amount = models.PositiveIntegerField(
         verbose_name='Количество')
