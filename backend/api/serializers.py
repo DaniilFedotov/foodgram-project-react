@@ -68,7 +68,13 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email', 'username', 'first_name', 'last_name', 'password',)
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',)
+
+
+class GetUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name',)
 
 
 class SignUpSerializer(serializers.Serializer):
@@ -83,6 +89,6 @@ class SignUpSerializer(serializers.Serializer):
 
 class GetJwtTokenSerializer(serializers.Serializer):
     """Сериализатор получения токена."""
-    username = serializers.CharField(
-        max_length=150,)
+    username = serializers.CharField(max_length=150,)
     confirmation_code = serializers.CharField()
+

@@ -15,9 +15,10 @@ from .serializers import (TagSerializer,
                           GetRecipeSerializer,
                           IngredientSerializer,
                           UserSerializer,
+                          GetUserSerializer,
                           SignUpSerializer,
                           GetJwtTokenSerializer)
-from .pagination import RecipesPagination
+from .pagination import Pagination
 from foodgram.settings import ADMIN_EMAIL
 
 
@@ -28,7 +29,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    pagination_class = RecipesPagination
+    pagination_class = Pagination
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -46,6 +47,12 @@ class IngredientViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
+    pagination_class = Pagination
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return GetUserSerializer
+        return UserSerializer
 
 
 def get_tokens_for_user(user):
