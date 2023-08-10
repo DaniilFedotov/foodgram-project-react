@@ -1,7 +1,6 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
+from users.models import User
 
 
 class Tag(models.Model):
@@ -39,8 +38,10 @@ class Recipe(models.Model):
         verbose_name='Ингредиенты',
         through='RecipeIngredient')
     is_favorited = models.BooleanField(
+        null=True,  # Временно
         verbose_name='Находится ли в избранном')
     is_in_shopping_cart = models.BooleanField(
+        null=True,  # Временно
         verbose_name='Находится ли в корзине')
     name = models.CharField(
         max_length=200,
