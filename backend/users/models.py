@@ -5,21 +5,23 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
     email = models.EmailField(
         max_length=256,
-        unique=True,)
+        unique=True,
+        verbose_name='Электронная почта')
     username = models.CharField(
         max_length=150,
-        unique=True)
+        unique=True,
+        verbose_name='Логин пользователя')
     first_name = models.CharField(
         null=True,  # Временно
         max_length=150,
-        unique=True)
+        verbose_name='Имя пользователя')
     last_name = models.CharField(
         null=True,  # Временно
         max_length=150,
-        unique=True)
+        verbose_name='Фамилия пользователя')
     password = models.CharField(
-        max_length=150)
-    #role = models.CharField(max_length=100)
+        max_length=150,
+        verbose_name='Пароль пользователя')
 
     class Meta:
         ordering = ('username',)
