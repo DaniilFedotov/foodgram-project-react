@@ -4,7 +4,7 @@ from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework.relations import PrimaryKeyRelatedField
 
 from recipes.models import Tag, Recipe, Ingredient, RecipeIngredient, RecipeTag
-from users.models import User
+from users.models import User, Subscriptions
 
 
 class TagSerializer(ModelSerializer):
@@ -100,3 +100,16 @@ class SpecialRecipeSerializer(ModelSerializer):
         model = Recipe
         fields = ('id', 'name', 'cooking_time')
         read_only_fields = ('id', 'name', 'cooking_time')
+
+
+class SubscriptionsSerializer(UserSerializer):
+    recipes = SpecialRecipeSerializer(many=True, read_only=True)
+    recipes_count = SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'is_subscribed', 'recipes', 'recipes_count')
+
+    def get_recipes_count(self, obj):
+        return obj.recipes.count()

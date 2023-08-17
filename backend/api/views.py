@@ -6,15 +6,17 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from recipes.models import Tag, Recipe, Ingredient, Favorites, ShoppingCart, RecipeIngredient
-from users.models import User
+from recipes.models import (Tag, Recipe, Ingredient, Favorites,
+                            ShoppingCart, RecipeIngredient)
+from users.models import User, Subscriptions
 from .serializers import (TagSerializer,
                           RecipeSerializer,
                           CreateRecipeSerializer,
                           SpecialRecipeSerializer,
                           IngredientSerializer,
                           UserSerializer,
-                          CreateUserSerializer)
+                          CreateUserSerializer,
+                          SubscriptionsSerializer)
 from .pagination import Pagination
 
 
@@ -97,3 +99,11 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.request.method == 'GET':
             return UserSerializer
         return CreateUserSerializer
+
+    @action(detail=False, methods=['get'])
+    def subscriptions(self, request):
+        user = request.user
+        subscribers = User.objects.filter(subscribers__user=user)
+        pages = self.paginate_queryset(subscribers)
+        serializer = SubscriptionsSerializer(pages, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
