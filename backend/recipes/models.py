@@ -37,12 +37,6 @@ class Recipe(models.Model):
         related_name='recipes',
         verbose_name='Ингредиенты',
         through='RecipeIngredient')
-    is_favorited = models.BooleanField(
-        null=True,  # Временно
-        verbose_name='Находится ли в избранном')
-    is_in_shopping_cart = models.BooleanField(
-        null=True,  # Временно
-        verbose_name='Находится ли в корзине')
     name = models.CharField(
         max_length=200,
         verbose_name='Название рецепта')
@@ -113,7 +107,7 @@ class RecipeIngredient(models.Model):
         return f'Рецепт {self.recipe} содержит {self.ingredient}'
 
 
-class RecipeUser(models.Model):
+class Favorites(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -121,6 +115,7 @@ class RecipeUser(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
+        related_name='favorites',
         verbose_name='Пользователь')
 
     class Meta:
@@ -130,3 +125,23 @@ class RecipeUser(models.Model):
 
     def __str__(self):
         return f'Рецепт {self.recipe} в избранном {self.user}'
+
+
+class ShoppingCart(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт')
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='shopping_cart',
+        verbose_name='Пользователь')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'user'], name='recipeuser_unique')]
+
+    def __str__(self):
+        return f'Рецепт {self.recipe} в корзине {self.user}'

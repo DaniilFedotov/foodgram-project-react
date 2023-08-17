@@ -31,22 +31,22 @@ class User(AbstractUser):
         return self.username
 
 
-class Follow(models.Model):
+class Subscriptions(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='follower',
+        related_name='subscriptions',
         verbose_name='Подписчик')
-    following = models.ForeignKey(
+    author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='following',
+        related_name='subscribers',
         verbose_name='Автор')
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'following'], name='follow_unique')]
+                fields=['user', 'author'], name='subscriptions_unique')]
 
     def __str__(self):
-        return f'Подписка {self.user} на {self.following}'
+        return f'Подписка {self.user} на {self.author}'
