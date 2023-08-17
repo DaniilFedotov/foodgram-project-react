@@ -1,4 +1,6 @@
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from recipes.models import Tag, Recipe, Ingredient
 from users.models import User
@@ -22,6 +24,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    @action(detail=True, methods=['post', 'delete'])
+    def favorite(self, request):
+        return None
+
+    @action(detail=True, methods=['post', 'delete'])
+    def shopping_cart(self, request):
+        return None
+
+    @action(detail=False, methods=['get'])
+    def download_shopping_cart(self, request):
+        return None
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
