@@ -93,3 +93,10 @@ class CreateRecipeSerializer(ModelSerializer):
                 recipe=recipe,
                 ingredient=ingredient,
                 amount=ingredient_data['amount'])
+
+
+class SpecialRecipeSerializer(ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'cooking_time')
+        read_only_fields = ('id', 'name', 'cooking_time')

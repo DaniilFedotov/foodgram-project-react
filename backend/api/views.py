@@ -1,12 +1,17 @@
-from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from django.db.models import Sum
+
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from recipes.models import Tag, Recipe, Ingredient
+from recipes.models import Tag, Recipe, Ingredient, Favorites, ShoppingCart, RecipeIngredient
 from users.models import User
 from .serializers import (TagSerializer,
                           RecipeSerializer,
                           CreateRecipeSerializer,
+                          SpecialRecipeSerializer,
                           IngredientSerializer,
                           UserSerializer,
                           CreateUserSerializer)
@@ -26,16 +31,52 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     @action(detail=True, methods=['post', 'delete'])
-    def favorite(self, request):
-        return None
+    def favorite(self, request, pk):
+        if request.method == 'POST':
+            recipe = get_object_or_404(Recipe, id=pk)
+            Favorites.objects.create(user=request.user, recipe=recipe)
+            serializer = SpecialRecipeSerializer(recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        favorite = Favorites.objects.filter(user=request.user, recipe__id=pk)
+        if favorite.exists():
+            favorite.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post', 'delete'])
-    def shopping_cart(self, request):
-        return None
+    def shopping_cart(self, request, pk):
+        if request.method == 'POST':
+            recipe = get_object_or_404(Recipe, id=pk)
+            if ShoppingCart.objects.get(user=request.user, recipe=recipe).exists():
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            ShoppingCart.objects.create(user=request.user, recipe=recipe)
+            serializer = SpecialRecipeSerializer(recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        cart = ShoppingCart.objects.filter(user=request.user, recipe__id=pk)
+        if cart.exists():
+            cart.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'])
-    def download_shopping_cart(self, request):
-        return None
+    def download_shopping_cart(self, request, pk):
+        user = request.user
+        if not user.shopping_cart.exists():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        ingredients = RecipeIngredient.objects.filter(
+            recipe__shopping_cart__user=request.user).values(
+            'ingredient__name',
+            'ingredient__measurement_unit').annotate(amount=Sum('amount'))
+        shopping_list = 'Список покупок.'
+        for ingredient in ingredients:
+            shopping_list += '\n'.join([
+                f'{ingredient["ingredient__name"]}'
+                f'({ingredient["ingredient__measurement_unit"]})'
+                f'{ingredient["amount"]}'])
+        filename = f'{user.username}_shopping_list.txt'
+        response = HttpResponse(shopping_list, content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        return response
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
