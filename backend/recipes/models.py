@@ -121,7 +121,7 @@ class Favorites(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['recipe', 'user'], name='recipeuser_unique')]
+                fields=['recipe', 'user'], name='userfavorites_unique')]
 
     def __str__(self):
         return f'Рецепт {self.recipe} в избранном {self.user}'
@@ -141,7 +141,7 @@ class ShoppingCart(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['recipe', 'user'], name='recipeuser_unique')]
+                fields=['recipe', 'user'], name='usershoppingcart_unique')]
 
     def __str__(self):
         return f'Рецепт {self.recipe} в корзине {self.user}'
