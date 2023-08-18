@@ -55,7 +55,8 @@ class RecipeSerializer(ModelSerializer):
                             'is_in_shopping_cart', 'name', 'text', 'cooking_time')
 
     def get_ingredients(self, obj):
-        ingredients = obj.ingredients.values(
+        recipe = obj
+        ingredients = recipe.ingredients.values(
             'id',
             'name',
             'measurement_unit',
