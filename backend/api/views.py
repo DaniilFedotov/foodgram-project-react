@@ -5,6 +5,7 @@ from django.db.models import Sum
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from djoser.views import UserViewSet
 
 from recipes.models import (Tag, Recipe, Ingredient, Favorites,
                             ShoppingCart, RecipeIngredient)
@@ -14,8 +15,8 @@ from .serializers import (TagSerializer,
                           CreateRecipeSerializer,
                           SpecialRecipeSerializer,
                           IngredientSerializer,
-                          UserSerializer,
-                          CreateUserSerializer,
+                          CustomUserSerializer,
+                          CustomCreateUserSerializer,
                           SubscriptionsSerializer)
 from .pagination import Pagination
 
@@ -92,14 +93,14 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     pagination_class = Pagination
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
-            return UserSerializer
-        return CreateUserSerializer
+            return CustomUserSerializer
+        return CustomCreateUserSerializer
 
     @action(detail=False, methods=['get'])
     def subscriptions(self, request):

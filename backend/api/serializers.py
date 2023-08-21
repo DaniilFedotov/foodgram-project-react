@@ -2,6 +2,7 @@ from django.db.models import F
 
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework.relations import PrimaryKeyRelatedField
+#from djoser.serializers import UserSerializer, UserCreateSerializer
 
 from recipes.models import Tag, Recipe, Ingredient, RecipeIngredient, RecipeTag
 from users.models import User, Subscriptions
@@ -21,23 +22,24 @@ class IngredientSerializer(ModelSerializer):
         read_only_fields = ('id', 'name', 'measurement_unit',)
 
 
-class CreateUserSerializer(ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('email', 'username', 'first_name', 'last_name', 'password',)
-
-
-class UserSerializer(ModelSerializer):
+class CustomUserSerializer(ModelSerializer):
     is_subscribed = SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed',)
-        read_only_fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed',)
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'password')
+        read_only_fields = ('is_subscribed',)
+        extra_kwargs = {'password': {'write_only': True}}
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
         return user.subscriptions.filter(author=obj).exists()
+
+
+class CustomCreateUserSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('email', 'username', 'first_name', 'last_name', 'password')
 
 
 class RecipeSerializer(ModelSerializer):
