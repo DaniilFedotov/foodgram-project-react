@@ -90,9 +90,9 @@ class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='ingredient',
+        related_name='ingredient_list',
         verbose_name='Рецепт')
-    ingredients = models.ForeignKey(
+    ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
         related_name='recipe',
@@ -103,7 +103,7 @@ class RecipeIngredient(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['recipe', 'ingredients'], name='recipeingredients_unique')]
+                fields=['recipe', 'ingredient'], name='recipeingredient_unique')]
 
     def __str__(self):
         return f'Рецепт {self.recipe} содержит {self.ingredients}'

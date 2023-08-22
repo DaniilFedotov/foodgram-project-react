@@ -102,6 +102,19 @@ class CustomUserViewSet(UserViewSet):
             return CustomUserSerializer
         return CustomCreateUserSerializer
 
+    @action(detail=True, methods=['post', 'delete'])
+    def subscribe(self, request, **kwargs): #немного по другому
+        user = request.user
+        author = get_object_or_404(User, id=self.kwargs.get('id'))
+        if request.method == 'POST':
+            serializer = SubscriptionsSerializer(author, data=request.data, context={'request': request})
+            serializer.is_valid(raise_exception=True)
+            Subscriptions.objects.create(user=user, author=author)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        subscription = get_object_or_404(Subscriptions, user=user, author=author)
+        subscription.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(detail=False, methods=['get'])
     def subscriptions(self, request):
         user = request.user
