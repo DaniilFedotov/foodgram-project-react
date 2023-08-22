@@ -103,7 +103,7 @@ class CustomUserViewSet(UserViewSet):
         return CustomCreateUserSerializer
 
     @action(detail=True, methods=['post', 'delete'])
-    def subscribe(self, request, **kwargs): #немного по другому
+    def subscribe(self, request, **kwargs):
         user = request.user
         author = get_object_or_404(User, id=self.kwargs.get('id'))
         if request.method == 'POST':

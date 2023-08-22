@@ -1,4 +1,3 @@
-from django.db import transaction
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 
