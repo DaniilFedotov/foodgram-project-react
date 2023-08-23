@@ -5,6 +5,7 @@ from rest_framework.serializers import ModelSerializer, SerializerMethodField, R
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.exceptions import ValidationError
 #from djoser.serializers import UserSerializer, UserCreateSerializer
+from drf_extra_fields.fields import Base64ImageField
 
 from recipes.models import Tag, Recipe, Ingredient, RecipeIngredient, RecipeTag
 from users.models import User, Subscriptions
@@ -67,15 +68,16 @@ class RecipeSerializer(ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = SerializerMethodField()
+    image = Base64ImageField()
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
-                  'is_in_shopping_cart', 'name', 'text', 'cooking_time')
+                  'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time')
         read_only_fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
-                            'is_in_shopping_cart', 'name', 'text', 'cooking_time')
+                            'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time')
 
     def get_ingredients(self, obj):
         recipe = obj
@@ -99,10 +101,11 @@ class CreateRecipeSerializer(ModelSerializer):
     tags = PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = RecipeIngredientSerializer(many=True)
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe
-        fields = ('id', 'tags', 'author', 'ingredients', 'name', 'text', 'cooking_time')
+        fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image', 'text', 'cooking_time')
 
     def validate_ingredients(self, value):
         ingredients = value
@@ -174,10 +177,12 @@ class CreateRecipeSerializer(ModelSerializer):
 
 
 class SpecialRecipeSerializer(ModelSerializer):
+    image = Base64ImageField()
+
     class Meta:
         model = Recipe
-        fields = ('id', 'name', 'cooking_time')
-        read_only_fields = ('id', 'name', 'cooking_time')
+        fields = ('id', 'name', 'image', 'cooking_time')
+        read_only_fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class SubscriptionsSerializer(CustomUserSerializer):
