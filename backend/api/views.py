@@ -98,6 +98,15 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (IsAdminOrReadOnly,)
 
+    # def create(self, request, *args, **kwargs):
+    #     if isinstance(request.data, list):
+    #         serializer = self.get_serializer(data=request.data, many=True)
+    #     else:
+    #         serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()

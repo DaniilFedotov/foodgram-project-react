@@ -21,6 +21,19 @@ class Tag(models.Model):
         return self.name
 
 
+class Ingredient(models.Model):
+    name = models.CharField(
+        max_length=200,
+        unique=True,
+        verbose_name='Название ингредиента')
+    measurement_unit = models.CharField(
+        max_length=200,
+        verbose_name='Единица измерения ингредиента')
+
+    def __str__(self):
+        return self.name
+
+
 class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag,
@@ -33,7 +46,7 @@ class Recipe(models.Model):
         related_name='recipes',
         verbose_name='Автор рецепта')
     ingredients = models.ManyToManyField(
-        'Ingredient',
+        Ingredient,
         related_name='recipes',
         verbose_name='Ингредиенты',
         through='RecipeIngredient')
@@ -51,19 +64,6 @@ class Recipe(models.Model):
 
     class Meta:
         ordering = ('-pub_date',)
-
-    def __str__(self):
-        return self.name
-
-
-class Ingredient(models.Model):
-    name = models.CharField(
-        max_length=200,
-        unique=True,
-        verbose_name='Название ингредиента')
-    measurement_unit = models.CharField(
-        max_length=200,
-        verbose_name='Единица измерения ингредиента')
 
     def __str__(self):
         return self.name
@@ -106,7 +106,7 @@ class RecipeIngredient(models.Model):
                 fields=['recipe', 'ingredient'], name='recipeingredient_unique')]
 
     def __str__(self):
-        return f'Рецепт {self.recipe} содержит {self.ingredients}'
+        return f'Рецепт {self.recipe} содержит {self.ingredient}'
 
 
 class Favorites(models.Model):
