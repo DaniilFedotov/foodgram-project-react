@@ -2,9 +2,11 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.db.models import Sum
 
-from rest_framework import viewsets, status
+from rest_framework import status
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from djoser.views import UserViewSet
 
 from recipes.models import (Tag, Recipe, Ingredient, Favorites,
@@ -19,11 +21,13 @@ from .serializers import (TagSerializer,
                           CustomCreateUserSerializer,
                           SubscriptionsSerializer)
 from .pagination import Pagination
+from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 
 
-class RecipeViewSet(viewsets.ModelViewSet):
+class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = Pagination
+    permission_classes = (IsAuthorOrReadOnly | IsAdminOrReadOnly,)
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -33,7 +37,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(detail=True, methods=['post', 'delete'])
+    @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
     def favorite(self, request, pk):
         if request.method == 'POST':
             recipe = get_object_or_404(Recipe, id=pk)
@@ -46,7 +50,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['post', 'delete'])
+    @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk):
         if request.method == 'POST':
             recipe = get_object_or_404(Recipe, id=pk)
@@ -61,7 +65,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         user = request.user
         if not user.shopping_cart.exists():
@@ -83,14 +87,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return response
 
 
-class TagViewSet(viewsets.ReadOnlyModelViewSet):
+class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = (IsAdminOrReadOnly,)
 
 
-class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+class IngredientViewSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -102,7 +108,7 @@ class CustomUserViewSet(UserViewSet):
             return CustomUserSerializer
         return CustomCreateUserSerializer
 
-    @action(detail=True, methods=['post', 'delete'])
+    @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
     def subscribe(self, request, **kwargs):
         user = request.user
         author = get_object_or_404(User, id=self.kwargs.get('id'))
@@ -115,7 +121,7 @@ class CustomUserViewSet(UserViewSet):
         subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
         user = request.user
         subscribers = User.objects.filter(subscribers__user=user)
