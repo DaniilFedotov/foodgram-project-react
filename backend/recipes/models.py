@@ -15,7 +15,7 @@ class Tag(models.Model):
     slug = models.SlugField(
         max_length=200,
         unique=True,
-        verbose_name='Раздел тега')
+        verbose_name='Слаг тега')
 
     def __str__(self):
         return self.name
@@ -99,7 +99,7 @@ class RecipeIngredient(models.Model):
         on_delete=models.CASCADE,
         related_name='recipe',
         verbose_name='Ингредиент')
-    amount = models.PositiveIntegerField(
+    amount = models.PositiveSmallIntegerField(
         verbose_name='Количество')
 
     class Meta:

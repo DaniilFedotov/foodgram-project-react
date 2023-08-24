@@ -1,11 +1,12 @@
 from django.db.models import F
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 
-from rest_framework.serializers import ModelSerializer, SerializerMethodField, ReadOnlyField, IntegerField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, ReadOnlyField
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.exceptions import ValidationError
 #from djoser.serializers import UserSerializer, UserCreateSerializer
-from drf_extra_fields.fields import Base64ImageField
+from drf_extra_fields.fields import Base64ImageField, IntegerField
 
 from recipes.models import Tag, Recipe, Ingredient, RecipeIngredient, RecipeTag
 from users.models import User, Subscriptions
@@ -26,7 +27,8 @@ class IngredientSerializer(ModelSerializer):
 
 
 class RecipeIngredientSerializer(ModelSerializer):
-    id = IntegerField(write_only=True) # без этого не создает
+    id = IntegerField(write_only=True)  # без этого не создает
+    amount = IntegerField(write_only=True)   # без этого не создает
 
     class Meta:
         model = RecipeIngredient
@@ -147,15 +149,17 @@ class CreateRecipeSerializer(ModelSerializer):
     #             amount=ingredient['amount']
     #         )
 
+    @transaction.atomic
     def create_ingredients_amount(self, ingredients, recipe):
         RecipeIngredient.objects.bulk_create(
             [RecipeIngredient(
-                ingredient=Ingredient.objects.get(id=ingredient['id']),
+                ingredient=Ingredient.objects.get(id=ingredient_data['id']),
                 recipe=recipe,
-                amount=ingredient['amount']
-            ) for ingredient in ingredients]
+                amount=ingredient_data['amount']
+            ) for ingredient_data in ingredients]
         )
 
+    @transaction.atomic
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
@@ -174,7 +178,6 @@ class CreateRecipeSerializer(ModelSerializer):
         self.create_ingredients_amount(recipe=instance, ingredients=ingredients)
         instance.save()
         return instance
-
 
 class SpecialRecipeSerializer(ModelSerializer):
     image = Base64ImageField()
