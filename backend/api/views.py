@@ -13,14 +13,12 @@ from recipes.models import (Tag, Recipe, Ingredient, Favorites,
                             ShoppingCart, RecipeIngredient)
 from users.models import User, Subscriptions
 from .serializers import (TagSerializer,
-                          #RecipeSerializer,
-                          #CreateRecipeSerializer,
                           SpecialRecipeSerializer,
                           IngredientSerializer,
                           CustomUserSerializer,
                           CustomCreateUserSerializer,
                           SubscriptionsSerializer,
-                          GetCreateRecipeSerializer)
+                          RecipeSerializer)
 from .pagination import Pagination
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 
@@ -29,12 +27,7 @@ class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = Pagination
     permission_classes = (IsAuthorOrReadOnly | IsAdminOrReadOnly,)
-    serializer_class = GetCreateRecipeSerializer
-
-    # def get_serializer_class(self):
-    #     if self.request.method == 'GET':
-    #         return RecipeSerializer
-    #     return CreateRecipeSerializer
+    serializer_class = RecipeSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -99,15 +92,6 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (IsAdminOrReadOnly,)
-
-    # def create(self, request, *args, **kwargs):
-    #     if isinstance(request.data, list):
-    #         serializer = self.get_serializer(data=request.data, many=True)
-    #     else:
-    #         serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class CustomUserViewSet(UserViewSet):
