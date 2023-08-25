@@ -13,13 +13,14 @@ from recipes.models import (Tag, Recipe, Ingredient, Favorites,
                             ShoppingCart, RecipeIngredient)
 from users.models import User, Subscriptions
 from .serializers import (TagSerializer,
-                          RecipeSerializer,
-                          CreateRecipeSerializer,
+                          #RecipeSerializer,
+                          #CreateRecipeSerializer,
                           SpecialRecipeSerializer,
                           IngredientSerializer,
                           CustomUserSerializer,
                           CustomCreateUserSerializer,
-                          SubscriptionsSerializer)
+                          SubscriptionsSerializer,
+                          GetCreateRecipeSerializer)
 from .pagination import Pagination
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 
@@ -28,11 +29,12 @@ class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = Pagination
     permission_classes = (IsAuthorOrReadOnly | IsAdminOrReadOnly,)
+    serializer_class = GetCreateRecipeSerializer
 
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return RecipeSerializer
-        return CreateRecipeSerializer
+    # def get_serializer_class(self):
+    #     if self.request.method == 'GET':
+    #         return RecipeSerializer
+    #     return CreateRecipeSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
