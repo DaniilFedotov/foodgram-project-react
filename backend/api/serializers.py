@@ -1,10 +1,8 @@
 from django.db.models import F
-from django.shortcuts import get_object_or_404
 
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, ReadOnlyField
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.exceptions import ValidationError
-#from djoser.serializers import UserSerializer, UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField, IntegerField
 
 from recipes.models import Tag, Recipe, Ingredient, RecipeIngredient, RecipeTag

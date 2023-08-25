@@ -3,6 +3,7 @@ version: '3.3'
 volumes:
   pg_data:
   static:
+  media:
 
 services:
 
@@ -24,7 +25,8 @@ services:
     env_file:
       - ./.env
     volumes:
-      - static:/backend_static  # Или /app/backend_static
+      - static:/backend_static
+      - media:/app/media
 
   frontend:
     build:
@@ -43,6 +45,7 @@ services:
 #      - ../frontend/build:/usr/share/nginx/html/
 #      - ../docs/:/usr/share/nginx/html/api/docs/
       - static:/staticfiles/
+      - media:/app/media/:ro
     depends_on:
       - backend
       - frontend
