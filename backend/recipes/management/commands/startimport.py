@@ -22,7 +22,9 @@ class Command(BaseCommand):
             reader = csv.DictReader(csvfile)
             records = []
             for row in reader:
-                records.append(Ingredient(name=row['name'], measurement_unit=row['measurement_unit']))
+                records.append(Ingredient(
+                    name=row['name'],
+                    measurement_unit=row['measurement_unit']))
             Ingredient.objects.bulk_create(records)
             self.stdout.write(self.style.SUCCESS('Данные импортированы'))
             csvfile.close()

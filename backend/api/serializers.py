@@ -2,9 +2,9 @@ from django.db.models import F
 
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework.exceptions import ValidationError
-from drf_extra_fields.fields import Base64ImageField, IntegerField
+from drf_extra_fields.fields import Base64ImageField
 
-from recipes.models import Tag, Recipe, Ingredient, RecipeIngredient, RecipeTag
+from recipes.models import Tag, Recipe, Ingredient, RecipeIngredient
 from users.models import User, Subscriptions
 
 
@@ -27,7 +27,8 @@ class CustomUserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'password')
+        fields = ('email', 'id', 'username', 'first_name',
+                  'last_name', 'is_subscribed', 'password')
         read_only_fields = ('is_subscribed',)
         extra_kwargs = {'password': {'write_only': True}}
 
@@ -64,8 +65,9 @@ class RecipeSerializer(ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
-                  'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time')
+        fields = ('id', 'tags', 'author', 'ingredients',
+                  'is_favorited', 'is_in_shopping_cart',
+                  'name', 'image', 'text', 'cooking_time')
         read_only_fields = ('is_favorited', 'is_in_shopping_cart',)
 
     def get_ingredients(self, obj):
@@ -94,16 +96,17 @@ class RecipeSerializer(ModelSerializer):
         ingredients = self.initial_data.get('ingredients')
         if not ingredients:
             raise ValidationError('Необходимо указать хотя бы один ингредиент')
-        valid_ingredients = {}
+        valid_ings = {}
         for ingredient in ingredients:
-            valid_ingredients[ingredient['id']] = int(ingredient['amount'])
+            valid_ings[ingredient['id']] = int(ingredient['amount'])
             if int(ingredient['amount']) <= 0:
-                raise ValidationError('Количество ингредиента должно быть больше ноля')
-        ingredient_objects = Ingredient.objects.filter(pk__in=valid_ingredients.keys())
-        for i_object in ingredient_objects:
-            valid_ingredients[i_object.pk] = (i_object, valid_ingredients[i_object.pk])
+                raise ValidationError(
+                    'Количество ингредиента должно быть больше ноля')
+        ing_objects = Ingredient.objects.filter(pk__in=valid_ings.keys())
+        for i_object in ing_objects:
+            valid_ings[i_object.pk] = (i_object, valid_ings[i_object.pk])
         data.update({'tags': tags,
-                     'ingredients': valid_ingredients,
+                     'ingredients': valid_ings,
                      'author': self.context.get('request').user})
         return data
 

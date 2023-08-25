@@ -1,7 +1,6 @@
 import os
 import os.path
 from pathlib import Path
-from datetime import timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,11 +8,9 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
-#'django-insecure-l2#856c+o8k+h!ddpzuy^j3yx#$j*%*x6t5zhl+zzf1me28452'
 
 DEBUG = True
 
-#ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'backend', '0.0.0.0:8000']
 ALLOWED_HOSTS = str(os.getenv('ALLOWED_HOSTS')).split(',')
 
 INSTALLED_APPS = [

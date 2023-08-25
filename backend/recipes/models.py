@@ -105,7 +105,8 @@ class RecipeIngredient(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['recipe', 'ingredient'], name='recipeingredient_unique')]
+                fields=['recipe', 'ingredient'],
+                name='recipeingredient_unique')]
 
     def __str__(self):
         return f'Рецепт {self.recipe} содержит {self.ingredient}'

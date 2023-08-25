@@ -9,8 +9,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from djoser.views import UserViewSet
 
-from recipes.models import (Tag, Recipe, Ingredient, Favorites,
-                            ShoppingCart, RecipeIngredient)
+from recipes.models import (Tag, Recipe, Ingredient, Favorites, ShoppingCart)
 from users.models import User, Subscriptions
 from .serializers import (TagSerializer,
                           SpecialRecipeSerializer,
@@ -32,7 +31,9 @@ class RecipeViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
+    @action(detail=True,
+            methods=['post', 'delete'],
+            permission_classes=[IsAuthenticated])
     def favorite(self, request, pk):
         if request.method == 'POST':
             recipe = get_object_or_404(Recipe, id=pk)
@@ -45,11 +46,14 @@ class RecipeViewSet(ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
+    @action(detail=True,
+            methods=['post', 'delete'],
+            permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk):
         if request.method == 'POST':
             recipe = get_object_or_404(Recipe, id=pk)
-            if ShoppingCart.objects.filter(user=request.user, recipe=recipe).exists():
+            if ShoppingCart.objects.filter(user=request.user,
+                                           recipe=recipe).exists():
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             ShoppingCart.objects.create(user=request.user, recipe=recipe)
             serializer = SpecialRecipeSerializer(recipe)
@@ -60,7 +64,9 @@ class RecipeViewSet(ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(detail=False,
+            methods=['get'],
+            permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         user = request.user
         if not user.shopping_cart.exists():
@@ -103,23 +109,34 @@ class CustomUserViewSet(UserViewSet):
             return CustomUserSerializer
         return CustomCreateUserSerializer
 
-    @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
+    @action(detail=True,
+            methods=['post', 'delete'],
+            permission_classes=[IsAuthenticated])
     def subscribe(self, request, **kwargs):
         user = request.user
         author = get_object_or_404(User, id=self.kwargs.get('id'))
         if request.method == 'POST':
-            serializer = SubscriptionsSerializer(author, data=request.data, context={'request': request})
+            serializer = SubscriptionsSerializer(author,
+                                                 data=request.data,
+                                                 context={'request': request})
             serializer.is_valid(raise_exception=True)
             Subscriptions.objects.create(user=user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        subscription = get_object_or_404(Subscriptions, user=user, author=author)
+        subscription = get_object_or_404(Subscriptions,
+                                         user=user,
+                                         author=author)
         subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(detail=False,
+            methods=['get'],
+            permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
         user = request.user
         subscribers = User.objects.filter(subscribers__user=user)
         pages = self.paginate_queryset(subscribers)
-        serializer = SubscriptionsSerializer(pages, many=True, context={'request': request})
+        serializer = SubscriptionsSerializer(
+            pages,
+            many=True,
+            context={'request': request})
         return self.get_paginated_response(serializer.data)
