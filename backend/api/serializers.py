@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import F
 
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
@@ -92,26 +93,26 @@ class RecipeSerializer(ModelSerializer):
         if not tags_ids:
             raise ValidationError('Необходимо указать хотя бы один тег')
         tags = Tag.objects.filter(id__in=tags_ids)
-
         ingredients = self.initial_data.get('ingredients')
         if not ingredients:
             raise ValidationError('Необходимо указать хотя бы один ингредиент')
-        valid_ings = {}
+        valid_ingredients = {}
         for ingredient in ingredients:
-            valid_ings[ingredient['id']] = int(ingredient['amount'])
+            valid_ingredients[ingredient['id']] = int(ingredient['amount'])
             if int(ingredient['amount']) <= 0:
                 raise ValidationError(
-                    'Количество ингредиента должно быть больше ноля')
-        ing_objects = Ingredient.objects.filter(pk__in=valid_ings.keys())
-        for i_object in ing_objects:
-            valid_ings[i_object.pk] = (i_object, valid_ings[i_object.pk])
+                    'Количество ингредиента должно быть больше нуля')
+        ingredient_objects = (Ingredient.objects.filter(
+            pk__in=valid_ingredients))
+        for ingredient_object in ingredient_objects:
+            valid_ingredients[ingredient_object.pk] = (
+                ingredient_object, valid_ingredients[ingredient_object.pk])
         data.update({'tags': tags,
-                     'ingredients': valid_ings,
+                     'ingredients': valid_ingredients,
                      'author': self.context.get('request').user})
         return data
 
     def create(self, validated_data):
-        print(validated_data)
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
@@ -124,6 +125,7 @@ class RecipeSerializer(ModelSerializer):
             ) for ingredient_data, amount in ingredients.values()])
         return recipe
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')

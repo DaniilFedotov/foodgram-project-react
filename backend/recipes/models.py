@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from users.models import User
 
@@ -30,6 +31,9 @@ class Ingredient(models.Model):
         max_length=200,
         verbose_name='Единица измерения ингредиента')
 
+    class Meta:
+        unique_together = ('name', 'measurement_unit',)
+
     def __str__(self):
         return self.name
 
@@ -59,7 +63,10 @@ class Recipe(models.Model):
     text = models.TextField(
         verbose_name='Описание рецепта')
     cooking_time = models.PositiveIntegerField(
-        verbose_name='Время приготовления (в минутах)')
+        verbose_name='Время приготовления (в минутах)',
+        validators=[
+            MaxValueValidator(120),
+            MinValueValidator(5)])
     pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации')
@@ -100,7 +107,10 @@ class RecipeIngredient(models.Model):
         related_name='recipe',
         verbose_name='Ингредиент')
     amount = models.PositiveSmallIntegerField(
-        verbose_name='Количество')
+        verbose_name='Количество',
+        validators=[
+            MaxValueValidator(1000),
+            MinValueValidator(1)])
 
     class Meta:
         constraints = [
