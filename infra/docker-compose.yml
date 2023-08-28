@@ -15,9 +15,7 @@ services:
       - pg_data:/var/lib/postgresql/data/
 
   backend:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
+    image: daniilfedotov/foodgram_backend
     depends_on:
       - db
     env_file:
@@ -27,9 +25,7 @@ services:
       - media:/app/media
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: daniilfedotov/foodgram_frontend
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static

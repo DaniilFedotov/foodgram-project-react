@@ -63,7 +63,7 @@ class RecipeViewSet(ModelViewSet):
             cart.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
-rc#4pb#~W]%axTd
+
     @action(detail=False,
             methods=['get'],
             permission_classes=[IsAuthenticated])
