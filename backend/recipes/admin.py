@@ -10,8 +10,8 @@ from .models import (Tag,
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author__name',)
-    list_filter = ('author__name', 'name', 'tags__name',)
+    list_display = ('name', 'author__first_name',)
+    list_filter = ('author__first_name', 'name', 'tags__name',)
 
 
 class IngredientAdmin(admin.ModelAdmin):
