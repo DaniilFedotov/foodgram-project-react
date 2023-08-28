@@ -13,3 +13,4 @@ https://foodgramfedotov.hopto.org/
 
 - Логин: admin
 - Пароль: admin_password
+- Электронная почта: admin@a.ru
