@@ -8,9 +8,3 @@
 ### Ссылка на ресурс: 
 
 https://foodgramfedotov.hopto.org/
-
-### Данные для входа в админ-зону:
-
-- Логин: admin
-- Пароль: admin_password
-- Электронная почта: admin@a.ru
