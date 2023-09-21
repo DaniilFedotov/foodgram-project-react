@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
+    """Модель пользователя."""
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
     email = models.EmailField(
         max_length=256,
@@ -30,6 +31,7 @@ class User(AbstractUser):
 
 
 class Subscriptions(models.Model):
+    """Модель подписки."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

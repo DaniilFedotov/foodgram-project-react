@@ -10,6 +10,7 @@ from users.models import User, Subscriptions
 
 
 class TagSerializer(ModelSerializer):
+    """Сериализатор модели тега."""
     class Meta:
         model = Tag
         fields = ('id', 'name', 'color', 'slug')
@@ -17,6 +18,7 @@ class TagSerializer(ModelSerializer):
 
 
 class IngredientSerializer(ModelSerializer):
+    """Сериализатор модели ингредиента."""
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit',)
@@ -24,6 +26,7 @@ class IngredientSerializer(ModelSerializer):
 
 
 class CustomUserSerializer(ModelSerializer):
+    """Сериализатор модели пользователя."""
     is_subscribed = SerializerMethodField()
 
     class Meta:
@@ -39,6 +42,7 @@ class CustomUserSerializer(ModelSerializer):
 
 
 class CustomCreateUserSerializer(ModelSerializer):
+    """Сериализатор для создания пользователя."""
     class Meta:
         model = User
         fields = ('email', 'username', 'first_name', 'last_name', 'password')
@@ -56,7 +60,7 @@ class CustomCreateUserSerializer(ModelSerializer):
 
 
 class RecipeSerializer(ModelSerializer):
-
+    """Сериализатор модели рецепта."""
     tags = TagSerializer(read_only=True, many=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = SerializerMethodField()
@@ -144,6 +148,7 @@ class RecipeSerializer(ModelSerializer):
 
 
 class SpecialRecipeSerializer(ModelSerializer):
+    """Сериализатор для упрощенного отображения рецепта."""
     image = Base64ImageField()
 
     class Meta:
@@ -153,6 +158,7 @@ class SpecialRecipeSerializer(ModelSerializer):
 
 
 class SubscriptionsSerializer(CustomUserSerializer):
+    """Сериализатор модели подписки."""
     recipes = SpecialRecipeSerializer(many=True, read_only=True)
     recipes_count = SerializerMethodField()
 

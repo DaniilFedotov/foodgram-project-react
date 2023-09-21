@@ -5,6 +5,7 @@ from users.models import User
 
 
 class Tag(models.Model):
+    """Модель тега."""
     name = models.CharField(
         max_length=200,
         unique=True,
@@ -23,6 +24,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
+    """Модель ингредиента."""
     name = models.CharField(
         max_length=200,
         unique=True,
@@ -39,6 +41,7 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
+    """Модель рецепта."""
     tags = models.ManyToManyField(
         Tag,
         related_name='recipes',
@@ -79,6 +82,7 @@ class Recipe(models.Model):
 
 
 class RecipeTag(models.Model):
+    """Промежуточная модель для связи рецепта и тега."""
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE)
@@ -96,6 +100,7 @@ class RecipeTag(models.Model):
 
 
 class RecipeIngredient(models.Model):
+    """Промежуточная модель для связи рецепта и ингредиента."""
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -123,6 +128,7 @@ class RecipeIngredient(models.Model):
 
 
 class Favorites(models.Model):
+    """Модель избранного."""
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -144,6 +150,7 @@ class Favorites(models.Model):
 
 
 class ShoppingCart(models.Model):
+    """Модель продуктовой корзины."""
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,

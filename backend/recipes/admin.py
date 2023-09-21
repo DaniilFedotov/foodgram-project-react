@@ -10,11 +10,13 @@ from .models import (Tag,
 
 
 class RecipeAdmin(admin.ModelAdmin):
+    """Класс для представления модели рецепта в админ-зоне."""
     list_display = ('name', 'author',)
     list_filter = ('author', 'name', 'tags__name',)
 
 
 class IngredientAdmin(admin.ModelAdmin):
+    """Класс для представления модели ингредиента в админ-зоне."""
     list_display = ('name', 'measurement_unit',)
     list_filter = ('name',)
 

@@ -23,18 +23,21 @@ from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 
 
 class RecipeViewSet(ModelViewSet):
+    """Вьюсет для модели рецепта."""
     queryset = Recipe.objects.all()
     pagination_class = Pagination
     permission_classes = (IsAuthorOrReadOnly | IsAdminOrReadOnly,)
     serializer_class = RecipeSerializer
 
     def perform_create(self, serializer):
+        """Функция сохранения пользователя как автора при создании рецепта."""
         serializer.save(author=self.request.user)
 
     @action(detail=True,
             methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def favorite(self, request, pk):
+        """Функция добавления рецепта в избранное."""
         if request.method == 'POST':
             recipe = get_object_or_404(Recipe, id=pk)
             Favorites.objects.create(user=request.user, recipe=recipe)
@@ -50,6 +53,7 @@ class RecipeViewSet(ModelViewSet):
             methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk):
+        """Функция добавления рецепта в продуктовую корзину."""
         if request.method == 'POST':
             recipe = get_object_or_404(Recipe, id=pk)
             if ShoppingCart.objects.filter(user=request.user,
@@ -68,6 +72,7 @@ class RecipeViewSet(ModelViewSet):
             methods=['get'],
             permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
+        """Функция загрузки продуктовой корзины пользователя."""
         user = request.user
         if not user.shopping_cart.exists():
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -89,22 +94,26 @@ class RecipeViewSet(ModelViewSet):
 
 
 class TagViewSet(ReadOnlyModelViewSet):
+    """Вьюсет для модели тега."""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (IsAdminOrReadOnly,)
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
+    """Вьюсет для модели ингредиента."""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (IsAdminOrReadOnly,)
 
 
 class CustomUserViewSet(UserViewSet):
+    """Вьюсет для модели пользователя."""
     queryset = User.objects.all()
     pagination_class = Pagination
 
     def get_serializer_class(self):
+        """Функция получения нужного сериализатора."""
         if self.request.method == 'GET':
             return CustomUserSerializer
         return CustomCreateUserSerializer
@@ -113,6 +122,7 @@ class CustomUserViewSet(UserViewSet):
             methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def subscribe(self, request, **kwargs):
+        """Функция подписки на пользователя."""
         user = request.user
         author = get_object_or_404(User, id=self.kwargs.get('id'))
         if request.method == 'POST':
@@ -132,6 +142,7 @@ class CustomUserViewSet(UserViewSet):
             methods=['get'],
             permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
+        """Функция выдачи пользователей, на которых подписан автор запроса."""
         user = request.user
         subscribers = User.objects.filter(subscribers__user=user)
         pages = self.paginate_queryset(subscribers)
